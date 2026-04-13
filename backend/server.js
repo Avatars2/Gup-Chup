@@ -21,7 +21,7 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' })); // JSON data accept karne ke liye
