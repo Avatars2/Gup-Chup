@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
   // Axios instance with default config
   const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api',
   });
 
   // Add interceptor to automatically add token
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const setupSocket = (userData) => {
-    const newSocket = io('http://localhost:5000');
+    const newSocket = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000');
     
     newSocket.emit('setup', userData);
     setSocket(newSocket);

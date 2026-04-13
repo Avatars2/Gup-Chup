@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import ScrollableFeed from 'react-scrollable-feed';
 import { Check, CheckCheck, Download, FileText, Film, MoreVertical, Edit2, Trash2, Mic } from 'lucide-react';
 
-const BASE_URL = 'http://localhost:5000'; // Adjust if needed
+const BASE_URL = process.env.REACT_APP_API_BASE_URL?.replace(/\/api$/, '') || 'http://localhost:5000'; // Adjust if needed
 
 const resolveFileUrl = (fileUrl) => {
   if (!fileUrl) return '';
