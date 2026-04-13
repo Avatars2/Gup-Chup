@@ -38,85 +38,14 @@ app.use("/api/upload", uploadRoutes);    // File Upload
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+// For Vercel deployment, export the app
+module.exports = app;
 
-const server = app.listen(
-  PORT,
-  () => console.log(`Server running on PORT ${PORT}...`)
-);
-
-// --- SOCKET.IO LOGIC ---
-const io = require("socket.io")(server, {
-  pingTimeout: 60000, // 60s tak connection check karega
-  cors: {
-    origin: "http://localhost:3000", // Aapka React app ka URL
-  },
-});
-
-io.on("connection", (socket) => {
-  console.log("Connected to socket.io");
-
-  // User apni personal room join karega (using UserID)
-  socket.on("setup", async (userData) => {
-    socket.join(userData._id);
-    console.log("User Setup: " + userData._id);
-    
-    // Mark user as online
-    try {
-      await User.findByIdAndUpdate(userData._id, { isOnline: true });
-      socket.broadcast.emit("user status change", { userId: userData._id, isOnline: true });
-    } catch (e) { console.error(e); }
-    
-    socket.emit("connected");
-  });
-
-  // Chat room join karna (1-on-1 ya Group)
-  socket.on("join chat", (room) => {
-    socket.join(room);
-    console.log("User Joined Room: " + room);
-  });
-
-  // Typing functionality (Optional but cool)
-  socket.on("typing", (room) => socket.in(room).emit("typing"));
-  socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
-
-  // New Message deliver karna
-  socket.on("new message", (newMessageRecieved) => {
-    var chat = newMessageRecieved.chat;
-
-    if (!chat.users) return console.log("chat.users not defined");
-
-    chat.users.forEach((user) => {
-      if (user._id == newMessageRecieved.sender._id) return;
-      socket.in(user._id).emit("message recieved", newMessageRecieved);
-    });
-  });
-
-  // Message Read Receipt
-  socket.on("message read", async (data) => {
-    const { chatId, userId } = data;
-    try {
-      // Broadcast read event to chat room
-      socket.in(chatId).emit("read update", { chatId, userId });
-    } catch (e) { console.error(e); }
-  });
-
-  socket.on("message edit", (updatedMessage) => {
-    const chat = updatedMessage.chat;
-    if (!chat.users) return;
-    chat.users.forEach((user) => {
-      if (user._id === updatedMessage.sender._id) return;
-      socket.in(user._id).emit("message updated", updatedMessage);
-    });
-  });
-
-  socket.on("message delete", (deleteData) => {
-    const { _id, chat } = deleteData;
-    if (!chat.users) return;
-    chat.users.forEach((user) => {
-      socket.in(user._id).emit("message deleted", { _id, chatId: chat._id });
-    });
-  });
+// For local development
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on PORT ${PORT}...`));
+}
 
   // Connection close hone par room leave karna
   socket.on("disconnect", () => {
@@ -131,4 +60,3 @@ io.on("connection", (socket) => {
       socket.broadcast.emit("user status change", { userId, isOnline: false, lastSeen: new Date() });
     } catch (e) { console.error(e); }
   });
-});
