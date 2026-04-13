@@ -46,17 +46,3 @@ if (require.main === module) {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => console.log(`Server running on PORT ${PORT}...`));
 }
-
-  // Connection close hone par room leave karna
-  socket.on("disconnect", () => {
-    console.log("USER DISCONNECTED");
-    // We would ideally track the userId here, but it's easier to handle via a custom 'logout' event 
-    // or by storing socket.userId during setup.
-  });
-
-  socket.on("logout", async (userId) => {
-    try {
-      await User.findByIdAndUpdate(userId, { isOnline: false, lastSeen: new Date() });
-      socket.broadcast.emit("user status change", { userId, isOnline: false, lastSeen: new Date() });
-    } catch (e) { console.error(e); }
-  });
