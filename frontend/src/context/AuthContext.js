@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
   // Axios instance with default config
   const api = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api',
+    baseURL: process.env.REACT_APP_API_BASE_URL || 'https://gup-chup-backend-six.vercel.app/api',
   });
 
   // Add interceptor to automatically add token
@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const setupSocket = (userData) => {
-    const newSocket = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000');
+    const newSocket = io(process.env.REACT_APP_SOCKET_URL || 'https://gup-chup-backend-six.vercel.app');
     
     newSocket.emit('setup', userData);
     setSocket(newSocket);
