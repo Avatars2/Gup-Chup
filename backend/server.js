@@ -34,6 +34,16 @@ app.use("/api/chat", chatRoutes);       // Create/Fetch Chats & Groups
 app.use("/api/message", messageRoutes); // Send/Fetch Messages
 app.use("/api/upload", uploadRoutes);    // File Upload
 
+// Root route
+app.get("/", (req, res) => {
+  res.send("Chat App Backend API is running");
+});
+
+// Favicon
+app.get("/favicon.ico", (req, res) => {
+  res.status(204).end();
+});
+
 // Error Handling (Agar route na mile ya koi crash ho)
 app.use(notFound);
 app.use(errorHandler);
