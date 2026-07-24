@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://gup-chup-backend-six.vercel.app/api';
+
 const HomePage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -9,7 +11,7 @@ const HomePage = () => {
 
   const handleLogin = async () => {
     try {
-      const { data } = await axios.post("/api/user/login", { email, password });
+      const { data } = await axios.post(`${API_BASE_URL}/user/login`, { email, password });
       localStorage.setItem("userInfo", JSON.stringify(data));
       navigate("/chats");
     } catch (error) {
